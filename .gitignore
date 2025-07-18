@@ -5,8 +5,9 @@ __pycache__/
 
 # C extensions
 
-# md directory
+# test directory
 articles_md/
+jsonl_files/
 
 *.so
 
