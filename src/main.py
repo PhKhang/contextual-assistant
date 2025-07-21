@@ -53,6 +53,8 @@ def main():
     response = (
         supabase.table("scraped_articles").select("hash", "updated_at", "id").execute()
     )
+    print("Response length:", len(response.data))
+    # return
     old_data = {item["id"]: item for item in response.data}
     old_hashes = set(item["hash"] for item in response.data)
     old_ids = set(str(key) for key in old_data.keys())
@@ -75,7 +77,7 @@ def main():
 
 
     old_docs = {
-        item["id"]: {
+        str(item["id"]): {
             "hash": item["hash"],
             "updated_at": item["updated_at"],
         }
@@ -97,18 +99,32 @@ def main():
         deleted += 1
         supabase.table("scraped_articles").delete().eq("id", doc_id).execute()
     
+    print(type(new_docs[0]["id"]))
+    print(type(old_docs))
+    print(new_docs[:10])
+    print("---------------")
+    # print(old_docs[:10])
+    # return
+
+    
     for docs in new_docs:
         if docs["hash"] in old_hashes:
             # Old scrape
             skipped += 1
         elif docs["id"] in old_docs:
             # Update scrape
-            updated += 1
-            supabase.table("scraped_articles").update(docs).eq("id", docs["id"]).execute()
+            try:
+                supabase.table("scraped_articles").update(docs).eq("id", docs["id"]).execute()
+                updated += 1
+            except Exception as e:
+                print(f"Error updating article {docs['id']}: {e}")
         else:
             # New scrape
-            added += 1
-            supabase.table("scraped_articles").insert(docs).execute()
+            try:
+                supabase.table("scraped_articles").insert(docs).execute()
+                added += 1
+            except Exception as e:
+                print(f"Error adding article {docs['id']}: {e}")
 
     print(f"Added: {added}, Updated: {updated}, Skipped: {skipped}, Deleted: {deleted}")
     
