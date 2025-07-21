@@ -32,14 +32,14 @@ def get_files_in_directory(directory):
 
 
 def main():
-    # print("Fetching articles...")
-    # articles = fetch_articles()
-    # print(f"Total articles fetched: {len(articles)}")
+    print("Fetching articles...")
+    articles = fetch_articles()
+    print(f"Total articles fetched: {len(articles)}")
 
-    # for article in articles:
-    #     save_article_as_md(article)
+    for article in articles:
+        save_article_as_md(article)
 
-    # print(f"Saved all Markdown files in '{OUTPUT_DIR}' folder.")
+    print(f"Saved all Markdown files in '{OUTPUT_DIR}' folder.")
 
     added = 0
     updated = 0
