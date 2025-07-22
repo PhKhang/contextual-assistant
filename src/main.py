@@ -109,6 +109,7 @@ def main():
 
     print("Check new documents against old documents...")
     logging.info("Check new documents against old documents...")
+    # return
     for doc in tqdm(new_docs):
         if doc["hash"] in old_hashes:
             # Old scrape
