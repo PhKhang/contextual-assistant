@@ -1,0 +1,13 @@
+services:
+  joblog-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: joblog-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/www/html/job_logs:/var/www/html/job_logs:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

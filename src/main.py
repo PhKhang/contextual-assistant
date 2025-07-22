@@ -40,16 +40,16 @@ def main():
     print("Log:", log_filename)
 
     print("Fetching articles...")
-    logging.info("Fetching articles...")
+    logging.info("\nFetching articles")
     articles = fetch_articles()
     print(f"Total articles fetched: {len(articles)}")
-    logging.info(f"Total articles fetched: {len(articles)}")
+    logging.info(f"- Total articles fetched: {len(articles)}")
 
-    logging.info("Saving articles as Markdown files...")
+    logging.info("\nSaving articles as Markdown files")
     for article in articles:
         save_article_as_md(article)
 
-    logging.info("Saved all Markdown files")
+    logging.info("- Saved all Markdown files")
     print(f"Saved all Markdown files in '{OUTPUT_DIR}' folder.")
 
     supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
@@ -92,14 +92,14 @@ def main():
     ]
 
     print("Connecting to Vector Store Service...")
-    logging.info("Connecting to Vector Store Service...")
+    logging.info("\nConnecting to Vector Store Service")
     client = OpenAI(api_key=settings.OPENAI_API_KEY)
     vector_store_id = settings.VECTOR_STORE_ID
 
     vector_store_service = VectorStoreService(
         client=client, vector_store_id=vector_store_id
     )
-    logging.info("Vector Store Service setup completed.")
+    logging.info("- Vector Store Service setup completed.")
 
     added = 0
     updated = 0
@@ -110,7 +110,7 @@ def main():
     updating_files = []
 
     print("Check new documents against old documents...")
-    logging.info("Check new documents against old documents...")
+    logging.info("\nCheck new documents against old documents")
     # return
     for doc in new_docs:
         if doc["hash"] in old_hashes:
@@ -125,10 +125,10 @@ def main():
 
     print(f"About to process {len(updating_files)} updates, {len(adding_files)} additions and {len(deleted_ids)} deletions.")
     logging.info(
-        f"About to process {len(updating_files)} updates, {len(adding_files)} additions and {len(deleted_ids)} deletions."
+        f"- About to process {len(updating_files)} updates, {len(adding_files)} additions and {len(deleted_ids)} deletions."
     )
 
-    modify = True
+    modify = False
     if modify:
         # Update loop
         for doc in updating_files:
@@ -142,6 +142,7 @@ def main():
                 file_id = vector_store_service.update_file(
                     old_docs[doc["id"]]["file_id"], file_stream
                 )
+                logging.info(f" + Update: {doc["file_path"]}")
                 cleaned_doc["file_id"] = file_id
                 supabase.table("scraped_articles").update(cleaned_doc).eq(
                     "id", doc["id"]
@@ -149,7 +150,7 @@ def main():
                 updated += 1
             except Exception as e:
                 print(f"Error updating article {doc['id']}: {e}")
-        logging.info(f"Updated {updated} articles.")
+        logging.info(f"- Updated {updated} articles.")
                 
         # Add loop
         for doc in adding_files:
@@ -161,12 +162,13 @@ def main():
             try:
                 file_streams = open(doc["file_path"], "rb")
                 file_id = vector_store_service.upload_file(file_streams)
+                logging.info(f" + Add: {doc["file_path"]}")
                 cleaned_doc["file_id"] = file_id
                 supabase.table("scraped_articles").insert(cleaned_doc).execute()
                 added += 1
             except Exception as e:
                 print(f"Error adding article {doc['id']}: {e}")
-        logging.info(f"Added {added} articles.")
+        logging.info(f"- Added {added} articles.")
                 
         # Delete loop
         for doc_id in deleted_ids:
@@ -176,24 +178,25 @@ def main():
                 .eq("id", doc_id)
                 .execute()
             )
+            logging.info(f" + Delete: {result.data[0]["file_id"]}")
             vector_store_service.delete_file(result.data[0]["file_id"])
             deleted += 1
-        logging.info(f"Deleted {deleted} articles.")
+        logging.info(f"- Deleted {deleted} articles.")
 
     print(f"Added: {added}, Updated: {updated}, Skipped: {skipped}, Deleted: {deleted}")
     logging.info(
-        f"Added: {added}, Updated: {updated}, Skipped: {skipped}, Deleted: {deleted}"
+        f"\nAdded: {added}, Updated: {updated}, Skipped: {skipped}, Deleted: {deleted}"
     )
 
-    print("Cleaning up old files...")
+    print("Cleaning up old files")
     for file in new_files:
         try:
             os.remove(file)
         except Exception as e:
             print(f"Error deleting file {file}: {e}")
 
-    logging.info("Old files cleaned up.")
-    logging.info("Job completed successfully.")
+    logging.info("\nOld files cleaned up.")
+    logging.info("\nJob completed successfully.")
 
 
 if __name__ == "__main__":
