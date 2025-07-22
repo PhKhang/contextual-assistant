@@ -5,3 +5,5 @@ markdownify
 langchain
 supabase
 tqdm
+pydantic
+pydantic-settings

@@ -9,6 +9,9 @@ __pycache__/
 articles_md/
 jsonl_files/
 
+# Logs
+*/job_logs
+
 *.so
 
 # Distribution / packaging
