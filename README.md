@@ -4,6 +4,8 @@
 
 ![Sanity check](public/sanity_check.png)
 
+The current chunking strategy is max token length of 800 tokens and overlap of 400 tokens. Plans for more improved chunking strategy is implemented in `Real.ipynb` for future support with jsonl files comming from OpenAI.
+
 The scraper is ran daily to keep the vector store up-to-date with the latest articles.
 
 Check the logs at [https://mentory.works/latest/](https://mentory.works/latest/) to see the latest run and past runs.
@@ -50,7 +52,7 @@ Or using Docker:
 # In /src directory
 docker build -t project .
 docker run --rm -v $(pwd):/app -e OPENAI_API_KEY=sk-... -e VECTOR_STORE_ID=vs_... -e SUPABASE_URL=https://...  -e SUPABASE_KEY=eyJ... run-script main.py
-# or
+# or (.env file is present)
 docker build -t run-script . && docker run --rm -v $(pwd):/app run-script main.py
 ```
 
@@ -82,11 +84,8 @@ All logs `/logs`:
 ![All logs](public/log_all.png)
 
 ## Testing notebook
-You can test the scraping and vector store upload using the provided Jupyter notebook:
+You can test the scraping and vector store upload using the provided Jupyter notebook: `Real.ipynb`
 
-```bash
-jupyter notebook
-```
 
 ## Deliverables
 
