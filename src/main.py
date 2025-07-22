@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 import os
 import logging
 from openai import OpenAI
-from tqdm import tqdm
 from supabase import Client, create_client
 from services.api_service import fetch_articles, save_article_as_md
 from services.vector_store_service import VectorStoreService
@@ -12,7 +11,7 @@ from core.config import settings
 LOG_DIR = "job_logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-log_filename = f"job_log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+log_filename = f"job_log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
 log_path = os.path.join(LOG_DIR, log_filename)
 
 logging.basicConfig(
@@ -110,7 +109,7 @@ def main():
     print("Check new documents against old documents...")
     logging.info("Check new documents against old documents...")
     # return
-    for doc in tqdm(new_docs):
+    for doc in new_docs:
         if doc["hash"] in old_hashes:
             # Old scrape
             skipped += 1
@@ -147,6 +146,7 @@ def main():
                 updated += 1
             except Exception as e:
                 print(f"Error updating article {doc['id']}: {e}")
+        logging.info(f"Updated {updated} articles.")
                 
         # Add loop
         for doc in adding_files:
@@ -163,6 +163,7 @@ def main():
                 added += 1
             except Exception as e:
                 print(f"Error adding article {doc['id']}: {e}")
+        logging.info(f"Added {added} articles.")
                 
         # Delete loop
         for doc_id in deleted_ids:
@@ -174,6 +175,7 @@ def main():
             )
             vector_store_service.delete_file(result.data[0]["file_id"])
             deleted += 1
+        logging.info(f"Deleted {deleted} articles.")
 
     print(f"Added: {added}, Updated: {updated}, Skipped: {skipped}, Deleted: {deleted}")
     logging.info(
