@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import os
 import logging
 from openai import OpenAI
@@ -11,7 +11,9 @@ from core.config import settings
 LOG_DIR = "job_logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-log_filename = f"job_log_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+now = datetime.now(timezone.utc) + timedelta(hours=7)
+
+log_filename = f"job_log_{now.strftime('%Y-%m-%d_%H-%M-%S')}.txt"
 log_path = os.path.join(LOG_DIR, log_filename)
 
 logging.basicConfig(
@@ -33,8 +35,9 @@ OUTPUT_DIR = "articles_md"
 
 def main():
     logging.info("=============================================")
-    logging.info(f"Job run: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    logging.info(f"Job run: {now.strftime('%Y-%m-%d %H:%M:%S')}")
     logging.info("=============================================")
+    print("Log:", log_filename)
 
     print("Fetching articles...")
     logging.info("Fetching articles...")
