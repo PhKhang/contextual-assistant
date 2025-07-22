@@ -142,7 +142,7 @@ def main():
                 file_id = vector_store_service.update_file(
                     old_docs[doc["id"]]["file_id"], file_stream
                 )
-                logging.info(f" + Update: {doc["file_path"]}")
+                logging.info(f" + Update: {doc['file_path']}")
                 cleaned_doc["file_id"] = file_id
                 supabase.table("scraped_articles").update(cleaned_doc).eq(
                     "id", doc["id"]
@@ -162,7 +162,7 @@ def main():
             try:
                 file_streams = open(doc["file_path"], "rb")
                 file_id = vector_store_service.upload_file(file_streams)
-                logging.info(f" + Add: {doc["file_path"]}")
+                logging.info(f" + Add: {doc['file_path']}")
                 cleaned_doc["file_id"] = file_id
                 supabase.table("scraped_articles").insert(cleaned_doc).execute()
                 added += 1
@@ -178,7 +178,7 @@ def main():
                 .eq("id", doc_id)
                 .execute()
             )
-            logging.info(f" + Delete: {result.data[0]["file_id"]}")
+            logging.info(f" + Delete: {result.data[0]['file_id']}")
             vector_store_service.delete_file(result.data[0]["file_id"])
             deleted += 1
         logging.info(f"- Deleted {deleted} articles.")

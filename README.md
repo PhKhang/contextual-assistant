@@ -54,6 +54,8 @@ docker build -t project .
 docker run -e OPENAI_API_KEY=your_api_key project
 # or
 docker run --rm -e OPENAI_API_KEY=sk-... -e VECTOR_STORE_ID=vs_... -e SUPABASE_URL=https://...  -e SUPABASE_KEY=eyJ... run-script main.py
+# or
+docker build -t run-script . ; docker run -v $(pwd):/app run-script  main.py
 ```
 
 ## Screenshot
